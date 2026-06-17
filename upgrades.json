@@ -1,0 +1,151 @@
+{
+  "upgrades": [
+    {
+      "name": "Berlin",
+      "combined": null,
+      "status": "live",
+      "date": "2021-04-15",
+      "execution": {
+        "fork": "Berlin",
+        "city": "Berlin, Germany",
+        "lat": 52.5174,
+        "lon": 13.3951
+      },
+      "consensus": null
+    },
+    {
+      "name": "London",
+      "combined": null,
+      "status": "live",
+      "date": "2021-08-05",
+      "execution": {
+        "fork": "London",
+        "city": "London, United Kingdom",
+        "lat": 51.5074,
+        "lon": -0.1278
+      },
+      "consensus": null
+    },
+    {
+      "name": "Altair",
+      "combined": null,
+      "status": "live",
+      "date": "2021-10-27",
+      "execution": null,
+      "consensus": {
+        "fork": "Altair",
+        "star": "Altair",
+        "ra": 297.696,
+        "dec": 8.868
+      }
+    },
+    {
+      "name": "The Merge",
+      "combined": "The Merge",
+      "status": "live",
+      "date": "2022-09-15",
+      "execution": {
+        "fork": "Paris",
+        "city": "Paris, France",
+        "lat": 48.8535,
+        "lon": 2.3484
+      },
+      "consensus": {
+        "fork": "Bellatrix",
+        "star": "Bellatrix",
+        "ra": 81.283,
+        "dec": 6.35
+      }
+    },
+    {
+      "name": "Shapella",
+      "combined": "Shapella",
+      "status": "live",
+      "date": "2023-04-12",
+      "execution": {
+        "fork": "Shanghai",
+        "city": "Shanghai, China",
+        "lat": 31.2313,
+        "lon": 121.47
+      },
+      "consensus": {
+        "fork": "Capella",
+        "star": "Capella",
+        "ra": 79.172,
+        "dec": 45.998
+      }
+    },
+    {
+      "name": "Dencun",
+      "combined": "Dencun",
+      "status": "live",
+      "date": "2024-03-13",
+      "execution": {
+        "fork": "Cancun",
+        "city": "Cancún, Mexico",
+        "lat": 21.1527,
+        "lon": -86.8426
+      },
+      "consensus": {
+        "fork": "Deneb",
+        "star": "Deneb",
+        "ra": 310.358,
+        "dec": 45.28
+      }
+    },
+    {
+      "name": "Pectra",
+      "combined": "Pectra",
+      "status": "live",
+      "date": "2025-05-07",
+      "execution": {
+        "fork": "Prague",
+        "city": "Prague, Czech Republic",
+        "lat": 50.0875,
+        "lon": 14.4213
+      },
+      "consensus": {
+        "fork": "Electra",
+        "star": "Electra",
+        "ra": 56.219,
+        "dec": 24.113
+      }
+    },
+    {
+      "name": "Fusaka",
+      "combined": "Fusaka",
+      "status": "scheduled",
+      "date": null,
+      "execution": {
+        "fork": "Osaka",
+        "city": "Osaka, Japan",
+        "lat": 34.6938,
+        "lon": 135.5015
+      },
+      "consensus": {
+        "fork": "Fulu",
+        "star": "Fulu (Zeta Cassiopeiae)",
+        "ra": 9.243,
+        "dec": 53.897
+      }
+    },
+    {
+      "name": "Glamsterdam",
+      "combined": "Glamsterdam",
+      "status": "planned",
+      "date": null,
+      "execution": {
+        "fork": "Amsterdam",
+        "city": "Amsterdam, Netherlands",
+        "lat": 52.3731,
+        "lon": 4.8925
+      },
+      "consensus": {
+        "fork": "Gloas",
+        "star": "Gloas",
+        "ra": null,
+        "dec": null
+      }
+    }
+  ]
+}

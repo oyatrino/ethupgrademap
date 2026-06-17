@@ -1,0 +1,35 @@
+name: Update data
+
+on:
+  schedule:
+    - cron: "0 9 1 4,10 *"  # 1 Apr & 1 Oct at 09:00 UTC (~twice a year)
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgeos-dev libproj-dev
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Rebuild data
+        run: python scripts/build_data.py
+      - name: Render static maps
+        run: python scripts/generate_maps.py
+      # The oyatrino org blocks Actions from pushing / opening PRs, so the refreshed
+      # files are uploaded as an artifact for a human to download and commit.
+      - name: Upload refreshed assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: ethupgrademap-data
+          path: |
+            upgrades.json
+            upgrade-count.json
+            starchart.png
+            globe.png
+            pairings.png

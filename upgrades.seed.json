@@ -1,0 +1,14 @@
+{
+  "_comment": "Hand-curated seed. Edit this when a new fork is named (~twice a year), then run scripts/build_data.py to produce the enriched upgrades.json. Curate: name, combined (portmanteau or null), status, the execution city and consensus star pairing. Coordinates and (where resolvable) dates are filled in automatically.",
+  "upgrades": [
+    { "name": "Berlin",      "combined": null,          "status": "live",      "date": "2021-04-15", "execution": { "fork": "Berlin",   "city": "Berlin, Germany" },          "consensus": null },
+    { "name": "London",      "combined": null,          "status": "live",      "date": "2021-08-05", "execution": { "fork": "London",   "city": "London, United Kingdom" },  "consensus": null },
+    { "name": "Altair",      "combined": null,          "status": "live",      "date": "2021-10-27", "execution": null,                                                       "consensus": { "fork": "Altair",    "star": "Altair" } },
+    { "name": "The Merge",   "combined": "The Merge",   "status": "live",      "date": "2022-09-15", "execution": { "fork": "Paris",    "city": "Paris, France" },           "consensus": { "fork": "Bellatrix", "star": "Bellatrix" } },
+    { "name": "Shapella",    "combined": "Shapella",    "status": "live",      "date": "2023-04-12", "execution": { "fork": "Shanghai", "city": "Shanghai, China" },          "consensus": { "fork": "Capella",   "star": "Capella" } },
+    { "name": "Dencun",      "combined": "Dencun",      "status": "live",      "date": "2024-03-13", "execution": { "fork": "Cancun",   "city": "Cancún, Mexico" },           "consensus": { "fork": "Deneb",     "star": "Deneb" } },
+    { "name": "Pectra",      "combined": "Pectra",      "status": "live",      "date": "2025-05-07", "execution": { "fork": "Prague",   "city": "Prague, Czech Republic" },   "consensus": { "fork": "Electra",   "star": "Electra" } },
+    { "name": "Fusaka",      "combined": "Fusaka",      "status": "scheduled", "date": null,         "execution": { "fork": "Osaka",    "city": "Osaka, Japan" },            "consensus": { "fork": "Fulu",      "star": "Fulu (Zeta Cassiopeiae)" } },
+    { "name": "Glamsterdam", "combined": "Glamsterdam", "status": "planned",   "date": null,         "execution": { "fork": "Amsterdam","city": "Amsterdam, Netherlands" },    "consensus": { "fork": "Gloas",     "star": "Gloas" } }
+  ]
+}
