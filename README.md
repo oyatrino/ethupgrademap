@@ -1,3 +1,13 @@
+<table align="center">
+<tr><td align="center" width="640">
+
+## ▶&nbsp; [Open the interactive map](https://oyatrino.github.io/ethupgrademap/)
+
+🌍 &nbsp;Execution-layer cities on a globe &nbsp;·&nbsp; ✨ &nbsp;consensus-layer stars on a celestial chart
+
+</td></tr>
+</table>
+
 # ethereum upgrade map — cities & stars
 
 Mapping Ethereum's dual-layer upgrade naming onto two projections: **execution-layer
