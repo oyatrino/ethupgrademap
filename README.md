@@ -52,13 +52,20 @@ sequencing — so this map just grows as new forks are named.
 
 [`upgrades.json`](upgrades.json) is the single source the interactive map reads at runtime.
 It is produced from the hand-curated [`upgrades.seed.json`](upgrades.seed.json) by
-[`scripts/build_data.py`](scripts/build_data.py), which auto-fills coordinates:
-
-- city → `lat`/`lon` via OpenStreetMap Nominatim
-- star → `ra`/`dec` via the CDS Sesame name resolver
+[`scripts/build_data.py`](scripts/build_data.py), which auto-fills coordinates.
 
 Names that don't resolve yet (e.g. the proposed star "Gloas") fall back to a curated table
 and are simply left unplotted until coordinates exist. Activation dates are curated.
+
+## data sources
+
+* **Upgrade names & city/star pairing** — the naming convention itself, formalised in
+  [EIP-8133](https://eips.ethereum.org/), curated by hand in
+  [`upgrades.seed.json`](upgrades.seed.json).
+* **Execution-layer city coordinates (`lat`/`lon`)** — OpenStreetMap Nominatim:
+  https://nominatim.openstreetmap.org
+* **Consensus-layer star coordinates (`ra`/`dec`)** — the CDS Sesame name resolver:
+  https://cds.unistra.fr/cgi-bin/Sesame
 
 ## Static renders
 
