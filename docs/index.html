@@ -83,6 +83,7 @@
   var COLOR_STAR = "#ffe08a";
   var COLOR_ROUTE = "#888888";
   var PLAY_MS = 900;
+  var DAY_MS = 86400000;
 
   function esc(s) {
     var el = document.createElement("span");
@@ -94,6 +95,8 @@
     if (status === "scheduled") return COLOR_SCHEDULED;
     return COLOR_PLANNED;
   }
+  // Floor a timestamp to UTC midnight so date comparisons ignore time-of-day.
+  function utcDayStart(ms) { return Math.floor(ms / DAY_MS) * DAY_MS; }
 
   // ===== Globe (execution layer) =====
   var globe = L.map("globe", { worldCopyJump: true }).setView([30, 15], 2);
@@ -267,6 +270,7 @@
   function stopPlayback() {
     if (playTimer) { clearTimeout(playTimer); playTimer = null; }
     isPlaying = false; playIndex = 0; setPlayIcon();
+    setSliderEnabled(true);
   }
   function playStep() {
     if (playIndex >= entries.length) { stopPlayback(); return; }
@@ -279,6 +283,7 @@
     if (isPlaying) { stopPlayback(); showAll(); return; }
     clearDynamic(); updateCount(0);
     isPlaying = true; playIndex = 0; setPlayIcon();
+    setSliderEnabled(false);
     playStep();
   }
 
@@ -300,6 +305,86 @@
         return c;
       }
     });
+  }
+
+  // ===== Date slider (one synced control per map) =====
+  var sliderInputs = [], sliderLabels = [];
+
+  function setSliderEnabled(enabled) {
+    sliderInputs.forEach(function (inp) { inp.disabled = !enabled; inp.style.opacity = enabled ? "1" : "0.5"; });
+    if (enabled && sliderInputs.length) {
+      var mx = sliderInputs[0].max;
+      sliderInputs.forEach(function (inp) { inp.value = mx; });
+      updateSliderLabel(Number(mx));
+    }
+  }
+
+  function updateSliderLabel(ts) {
+    if (!sliderInputs.length) return;
+    var mx = Number(sliderInputs[0].max), text;
+    if (ts >= mx) {
+      text = "All upgrades";
+    } else {
+      var d = new Date(ts);
+      text = "Upgrades as of " + d.getUTCFullYear() + "-" +
+        String(d.getUTCMonth() + 1).padStart(2, "0") + "-" + String(d.getUTCDate()).padStart(2, "0");
+    }
+    sliderLabels.forEach(function (l) { l.textContent = text; });
+  }
+
+  function filterByDate(ts) {
+    if (isPlaying) return;
+    var atMax = ts >= Number(sliderInputs[0].max);
+    var sliderDay = utcDayStart(ts);
+    clearDynamic();
+    var shown = 0;
+    for (var i = 0; i < entries.length; i++) {
+      var u = entries[i];
+      if (u.date) {
+        // Compare on the UTC day so an upgrade appears on its activation day.
+        if (utcDayStart(new Date(u.date).getTime()) <= sliderDay) { addUpgrade(i); shown++; }
+      } else if (atMax) {
+        // Undated (upcoming) upgrades show only when the slider is at "all".
+        addUpgrade(i); shown++;
+      }
+    }
+    updateCount(shown);
+    updateSliderLabel(ts);
+  }
+
+  function SliderControl(minTs, maxTs) {
+    return L.Control.extend({
+      options: { position: "bottomleft" },
+      onAdd: function () {
+        var c = L.DomUtil.create("div", "");
+        c.style.cssText = "background:rgba(255,255,255,0.95);padding:9px 12px;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,0.35);min-width:210px;";
+        var lab = L.DomUtil.create("div", "", c);
+        lab.style.cssText = "font-size:12px;margin-bottom:6px;color:#222;font-weight:600;";
+        lab.textContent = "All upgrades";
+        var inp = L.DomUtil.create("input", "", c);
+        inp.type = "range"; inp.min = String(minTs); inp.max = String(maxTs);
+        inp.value = String(maxTs); inp.step = String(DAY_MS);
+        inp.style.cssText = "width:100%;cursor:pointer;";
+        inp.setAttribute("aria-label", "Filter upgrades by activation date");
+        L.DomEvent.disableClickPropagation(c);
+        L.DomEvent.disableScrollPropagation(c);
+        L.DomEvent.on(inp, "input", function () {
+          sliderInputs.forEach(function (o) { if (o !== inp) o.value = inp.value; });
+          filterByDate(Number(inp.value));
+        });
+        sliderInputs.push(inp); sliderLabels.push(lab);
+        return c;
+      }
+    });
+  }
+
+  function addSliders() {
+    var dts = entries.filter(function (u) { return u.date; }).map(function (u) { return new Date(u.date).getTime(); });
+    if (!dts.length) return;
+    var minTs = Math.min.apply(null, dts);
+    var maxTs = Date.now();
+    new (SliderControl(minTs, maxTs))().addTo(globe);
+    new (SliderControl(minTs, maxTs))().addTo(stars);
   }
 
   // ===== Legends =====
@@ -359,6 +444,7 @@
     .then(function (data) {
       entries = (data && data.upgrades) || [];
       showAll();
+      addSliders();
       setMode("globe");
     })
     .catch(function (err) { console.error("Failed to load upgrades.json:", err); });
