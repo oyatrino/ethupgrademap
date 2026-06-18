@@ -99,7 +99,7 @@
   function utcDayStart(ms) { return Math.floor(ms / DAY_MS) * DAY_MS; }
 
   // ===== Globe (execution layer) =====
-  var globe = L.map("globe", { worldCopyJump: true }).setView([30, 15], 2);
+  var globe = L.map("globe", { worldCopyJump: true, minZoom: 2 }).setView([30, 15], 2);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 18
