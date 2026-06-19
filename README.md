@@ -10,6 +10,8 @@
 
 # ethereum upgrade map — cities & stars
 
+[![Built with Periplum](https://img.shields.io/badge/built_with-Periplum-4da3ff)](https://periplum.js.org)
+
 Mapping Ethereum's dual-layer upgrade naming onto two projections: **execution-layer
 upgrades as cities on a globe**, **consensus-layer upgrades as stars on a celestial
 chart**.
