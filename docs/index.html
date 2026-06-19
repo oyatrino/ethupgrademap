@@ -2,27 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ethereum Upgrade Map — Execution Cities & Consensus Stars (EIP-8133)</title>
-<meta name="description" content="Interactive map of Ethereum network upgrades: execution-layer forks named after Devcon/Devconnect host cities (Berlin, London, Shanghai, Cancún, Prague, Osaka) on a world globe, and consensus-layer forks named after stars (Altair, Bellatrix, Capella, Deneb, Electra, Fulu) on a celestial RA/Dec chart. Per EIP-8133.">
-<meta name="keywords" content="Ethereum, Ethereum upgrades, execution layer, consensus layer, hard fork, Devcon, Devconnect, EIP-8133, Pectra, Dencun, Shapella, Fusaka, Glamsterdam, star chart, blockchain map, interactive map, Ethereum roadmap">
-<meta name="author" content="oyatrino">
-<meta name="robots" content="index, follow">
-<meta name="theme-color" content="#16161e">
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
+<!-- SEO the engine doesn't inject (it adds description/OG/Twitter/theme/favicon itself) -->
 <link rel="canonical" href="https://oyatrino.github.io/ethupgrademap/">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Ethereum Upgrade Map">
-<meta property="og:title" content="Ethereum Upgrade Map — Cities & Stars">
-<meta property="og:description" content="Execution-layer upgrades as Devcon host cities on a globe; consensus-layer upgrades as stars on a celestial chart. Per EIP-8133.">
-<meta property="og:url" content="https://oyatrino.github.io/ethupgrademap/">
-<meta property="og:image" content="https://raw.githubusercontent.com/oyatrino/ethupgrademap/main/starchart.png">
-<meta property="og:image:alt" content="Ethereum consensus-layer upgrades plotted as named stars on a right-ascension/declination chart">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ethereum Upgrade Map — Cities & Stars">
-<meta name="twitter:description" content="Execution-layer upgrades as Devcon cities on a globe; consensus-layer upgrades as stars on a celestial chart.">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/oyatrino/ethupgrademap/main/starchart.png">
+<meta name="keywords" content="Ethereum, Ethereum upgrades, execution layer, consensus layer, hard fork, Devcon, Devconnect, EIP-8133, Pectra, Dencun, Shapella, Fusaka, star chart, blockchain map, interactive map">
+<link rel="apple-touch-icon" href="favicon.png">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"Ethereum Upgrade Map","url":"https://oyatrino.github.io/ethupgrademap/","applicationCategory":"BrowserApplication","operatingSystem":"Web","browserRequirements":"Requires JavaScript","description":"Interactive dual-projection map of Ethereum execution-layer (Devcon host cities) and consensus-layer (named stars) network upgrades, per EIP-8133.","author":{"@type":"Organization","name":"oyatrino"}}
 </script>
@@ -30,425 +14,52 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<style>
-  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  #title { height: 40px; display: flex; align-items: center; padding: 0 14px; background: #16161e; color: #fff; font-size: 14px; font-weight: 600; letter-spacing: 0.3px; gap: 10px; }
-  #title-count { opacity: 0.6; font-weight: 400; }
-  #title .spacer { margin-left: auto; }
-  #title a.gh { display: flex; align-items: center; color: #fff; opacity: 0.6; transition: opacity 0.15s; }
-  #title a.gh:hover { opacity: 1; }
-  #mode-switch { display: flex; border: 1px solid #3a3a4a; border-radius: 6px; overflow: hidden; }
-  #mode-switch button { background: #1f1f2b; color: #cfcfe0; border: none; padding: 5px 12px; font-size: 13px; cursor: pointer; }
-  #mode-switch button.active { background: #4da3ff; color: #06121f; font-weight: 600; }
-  #mode-switch button:not(.active):hover { background: #2a2a3a; }
-  .view { height: calc(100vh - 40px); width: 100%; }
-  #globe { display: block; }
-  #stars { display: none; background: #05060f; }
-  .leaflet-tooltip.label-tip { background: transparent; border: none; box-shadow: none; color: #222; font-weight: 600; font-size: 11px; padding: 0; }
-  #stars .leaflet-tooltip.label-tip { color: #ffe9a8; text-shadow: 0 0 5px #000, 0 0 5px #000; }
-  .leaflet-tooltip.star-tip { background: transparent; border: none; box-shadow: none; color: #aeb8e8; font-size: 10px; padding: 0; text-shadow: 0 0 4px #000; }
-  .leaflet-tooltip.constel-tip { background: transparent; border: none; box-shadow: none; color: #5b6bb0; font-size: 11px; font-style: italic; letter-spacing: 1px; padding: 0; text-transform: uppercase; }
-  .playback-control a { background: #1f1f2b; color: #cfcfe0; width: 32px; height: 32px; line-height: 32px; text-align: center; font-size: 16px; display: block; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.4); text-decoration: none; }
-  .playback-control a:hover { background: #2a2a3a; }
-  .legend { background: rgba(255,255,255,0.95); padding: 8px 12px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.3); line-height: 1.6; font-size: 12px; }
-  #stars .legend, .legend.dark { background: rgba(12,14,26,0.92); color: #d8d8ee; }
-  .legend i { width: 11px; height: 11px; display: inline-block; margin-right: 6px; border-radius: 50%; vertical-align: middle; }
-  .legend .line { width: 18px; height: 0; border-top: 2px dashed #888; display: inline-block; margin-right: 6px; vertical-align: middle; }
-  .leaflet-popup-content { font-size: 13px; line-height: 1.5; }
-  .pair-tag { display: inline-block; background: #eef4ff; color: #1b5fb0; border-radius: 3px; padding: 0 5px; font-size: 11px; font-weight: 600; }
-</style>
+<script src="https://cdn.jsdelivr.net/gh/periplum/periplum-core@v0.3.0/dist/periplum.js"></script>
 </head>
 <body>
-<div id="title">
-  <span id="title-text">Ethereum Upgrade Map</span>
-  <span id="title-count"></span>
-  <span class="spacer"></span>
-  <div id="mode-switch" role="group" aria-label="Switch projection">
-    <button id="btn-globe" class="active" aria-pressed="true">🌍 Execution · cities</button>
-    <button id="btn-stars" aria-pressed="false">✨ Consensus · stars</button>
-  </div>
-  <a class="gh" href="https://github.com/oyatrino/ethupgrademap" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository">
-    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.64 7.64 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-  </a>
-</div>
-<div id="globe" class="view"></div>
-<div id="stars" class="view"></div>
-
 <script>
-(function () {
-  var DATA_URL = "https://raw.githubusercontent.com/oyatrino/ethupgrademap/main/upgrades.json";
-  var COLOR_LIVE = "#1f77b4";
-  var COLOR_SCHEDULED = "#ff7f0e";
-  var COLOR_PLANNED = "#9aa0b5";
-  var COLOR_STAR = "#ffe08a";
-  var COLOR_ROUTE = "#888888";
-  var PLAY_MS = 900;
-  var DAY_MS = 86400000;
-
-  function esc(s) {
-    var el = document.createElement("span");
-    el.textContent = s;
-    return el.innerHTML;
+  // Turn the existing upgrades.json into Periplum canonical items.
+  function adapt(raw) {
+    return (raw.upgrades || []).map(function (u) {
+      var placements = [];
+      var ex = u.execution, cl = u.consensus;
+      if (ex && ex.lat != null && ex.lon != null) {
+        placements.push({ map: "earth", lat: ex.lat, lon: ex.lon,
+          label: (ex.city || "").split(",")[0],
+          popup: { "Execution": ex.fork, "City": ex.city, "Network": u.status } });
+      }
+      if (cl && cl.ra != null && cl.dec != null) {
+        placements.push({ map: "sky", ra: cl.ra, dec: cl.dec,
+          label: (cl.star || "").split(" ")[0],
+          popup: { "Consensus": cl.fork, "Star": cl.star } });
+      }
+      return { name: u.name, date: u.date, status: u.status,
+        pairing: (u.combined && u.combined !== u.name) ? u.combined : null,
+        placements: placements };
+    });
   }
-  function statusColor(status) {
-    if (status === "live") return COLOR_LIVE;
-    if (status === "scheduled") return COLOR_SCHEDULED;
-    return COLOR_PLANNED;
-  }
-  // Floor a timestamp to UTC midnight so date comparisons ignore time-of-day.
-  function utcDayStart(ms) { return Math.floor(ms / DAY_MS) * DAY_MS; }
 
-  // ===== Globe (execution layer) =====
-  var globe = L.map("globe", { worldCopyJump: true, minZoom: 2 }).setView([30, 15], 2);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 18
-  }).addTo(globe);
-
-  // ===== Star chart (consensus layer) =====
-  var stars = L.map("stars", {
-    crs: L.CRS.Simple, minZoom: -3, maxZoom: 4, zoomSnap: 0.25, attributionControl: false
+  Periplum.render({
+    title: "Ethereum Upgrade Map",
+    dataUrl: "https://raw.githubusercontent.com/oyatrino/ethupgrademap/main/upgrades.json",
+    adapt: adapt,
+    repo: "https://github.com/oyatrino/ethupgrademap",
+    favicon: "favicon.png",
+    theme: { headerBg: "#16161e", accent: "#4da3ff" },
+    routeLabel: "Chronological order",
+    statusColors: { "live": "#1f77b4", "scheduled": "#ff7f0e", "planned": "#9aa0b5" },
+    seo: {
+      description: "Interactive map of Ethereum network upgrades: execution-layer forks named after Devcon/Devconnect host cities on a world globe, and consensus-layer forks named after stars on a celestial RA/Dec chart. Per EIP-8133.",
+      image: "https://raw.githubusercontent.com/oyatrino/ethupgrademap/main/starchart.png"
+    },
+    basemaps: [
+      { id: "earth", name: "🌍 Execution · cities", type: "tiles",
+        tileUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attribution: "&copy; OpenStreetMap contributors",
+        minZoom: 2, initialView: [30, 15], initialZoom: 2 },
+      { id: "sky", name: "✨ Consensus · stars", type: "celestial" }
+    ]
   });
-  // Celestial point -> Leaflet Simple coords. Dec = y (up). RA increases to the
-  // LEFT (x = -RA), so constellations appear with their familiar handedness.
-  function sky(ra, dec) { return [dec, -ra]; }
-  // Crop to the populated northern band so the named stars aren't tiny on open.
-  var SKY_BOUNDS = [sky(0, -25), sky(360, 72)];
-  var skyFitted = false;
-
-  // ----- Reference sky: real bright stars + constellation stick-figures -----
-  // Each constellation: stars [RA°, Dec°, magnitude, optionalName], lines [[i,j]...],
-  // and a label anchor [RA°, Dec°]. Coordinates are J2000, rounded.
-  var CONSTELLATIONS = [
-    { name: "Orion", label: [84, -4], lines: [[0,1],[0,4],[1,6],[4,5],[5,6],[4,3],[6,2]],
-      stars: [[88.79,7.41,0.5,"Betelgeuse"],[81.28,6.35,1.6],[78.63,-8.20,0.1,"Rigel"],
-              [86.94,-9.67,2.1],[85.19,-1.94,1.7],[84.05,-1.20,1.7],[83.00,-0.30,2.2]] },
-    { name: "Cygnus", label: [304, 36], lines: [[0,1],[1,4],[3,1],[1,2]],
-      stars: [[310.36,45.28,1.3],[305.56,40.26,2.2],[311.55,33.97,2.5],[296.24,45.13,2.9],[292.68,27.96,3.1]] },
-    { name: "Aquila", label: [296, 4], lines: [[1,0],[0,2],[0,3],[0,4],[0,5]],
-      stars: [[297.70,8.87,0.8],[296.56,10.61,2.7],[298.83,6.41,3.7],[291.37,3.11,3.4],[286.35,13.86,3.0],[302.83,-0.82,3.2]] },
-    { name: "Auriga", label: [82, 41], lines: [[0,1],[1,2],[2,3],[3,4],[4,0]],
-      stars: [[79.17,46.00,0.1],[89.88,44.95,1.9],[89.93,37.21,2.6],[81.57,28.61,1.6,"Elnath"],[74.95,33.17,2.7]] },
-    { name: "Cassiopeia", label: [13, 66], lines: [[0,1],[1,2],[2,3],[3,4]],
-      stars: [[2.29,59.15,2.3],[10.13,56.54,2.2],[14.18,60.72,2.2],[21.45,60.24,2.7],[28.60,63.67,3.4]] },
-    { name: "Ursa Major", label: [185, 62], lines: [[0,1],[1,2],[2,3],[3,0],[3,4],[4,5],[5,6]],
-      stars: [[165.93,61.75,1.8,"Dubhe"],[165.46,56.38,2.4],[178.46,53.69,2.4],[183.86,57.03,3.3],
-              [193.51,55.96,1.8],[200.98,54.93,2.0],[206.89,49.31,1.9]] },
-    { name: "Taurus", label: [66, 12], lines: [[0,1],[0,2],[0,3]],
-      stars: [[68.98,16.51,0.9,"Aldebaran"],[64.74,15.63,3.6],[67.15,19.18,3.5],[81.57,28.61,1.6]] }
-  ];
-  // Bright reference stars outside the drawn figures (labelled signposts).
-  var REFERENCE_STARS = [
-    [279.23,38.78,0.0,"Vega"],[213.92,19.18,0.0,"Arcturus"],[152.09,11.97,1.4,"Regulus"],
-    [116.33,28.03,1.2,"Pollux"],[114.83,5.22,0.3,"Procyon"]
-  ];
-  // The Pleiades cluster (Electra, a fork-star, lives here): a few tight members.
-  var PLEIADES = [[56.87,24.11,2.9],[56.46,24.37,3.9],[57.29,24.05,3.6],[56.58,23.95,4.2],[56.30,24.47,4.3]];
-  // Summer Triangle asterism (links fork-stars Deneb & Altair to Vega).
-  var SUMMER_TRIANGLE = [[279.23,38.78],[310.36,45.28],[297.70,8.87]];
-
-  function magRadius(mag) { return Math.max(0.7, 3.4 - 0.45 * mag); }
-
-  function drawReferenceSky() {
-    // faint random background for depth (deterministic so it never flickers)
-    var seed = 20240313;
-    function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
-    for (var i = 0; i < 160; i++) {
-      L.circleMarker(sky(rnd() * 360, rnd() * 180 - 90), {
-        radius: rnd() * 0.9 + 0.3, stroke: false, fillColor: "#aab4e6",
-        fillOpacity: rnd() * 0.4 + 0.12, interactive: false
-      }).addTo(stars);
-    }
-    // RA/Dec grid + celestial equator
-    var g = { color: "#202a4d", weight: 0.5, interactive: false };
-    for (var ra = 0; ra <= 360; ra += 30) L.polyline([sky(ra, -90), sky(ra, 90)], g).addTo(stars);
-    for (var dec = -60; dec <= 60; dec += 30) L.polyline([sky(0, dec), sky(360, dec)], g).addTo(stars);
-    L.polyline([sky(0, 0), sky(360, 0)], { color: "#34407a", weight: 1, dashArray: "4 5", interactive: false }).addTo(stars);
-
-    // Summer Triangle (dashed asterism)
-    L.polyline(SUMMER_TRIANGLE.concat([SUMMER_TRIANGLE[0]]).map(function (p) { return sky(p[0], p[1]); }),
-      { color: "#3b4a86", weight: 0.8, dashArray: "2 6", interactive: false }).addTo(stars);
-
-    // Constellations: lines, then stars, then a faint name label.
-    CONSTELLATIONS.forEach(function (c) {
-      c.lines.forEach(function (ln) {
-        var a = c.stars[ln[0]], b = c.stars[ln[1]];
-        L.polyline([sky(a[0], a[1]), sky(b[0], b[1])],
-          { color: "#46568f", weight: 0.9, opacity: 0.7, interactive: false }).addTo(stars);
-      });
-      c.stars.forEach(function (s) { drawBackgroundStar(s); });
-      L.circleMarker(sky(c.label[0], c.label[1]), { radius: 0, opacity: 0, fillOpacity: 0, interactive: false })
-        .addTo(stars).bindTooltip(esc(c.name), { permanent: true, direction: "center", className: "constel-tip" });
-    });
-    REFERENCE_STARS.forEach(function (s) { drawBackgroundStar(s); });
-    PLEIADES.forEach(function (s) { drawBackgroundStar(s); });
-    L.circleMarker(sky(56.5, 25.6), { radius: 0, opacity: 0, fillOpacity: 0, interactive: false })
-      .addTo(stars).bindTooltip("Pleiades", { permanent: true, direction: "center", className: "constel-tip" });
-  }
-
-  function drawBackgroundStar(s) {
-    var m = L.circleMarker(sky(s[0], s[1]), {
-      radius: magRadius(s[2]), stroke: false, fillColor: "#e9eeff", fillOpacity: 0.95, interactive: false
-    }).addTo(stars);
-    if (s[3]) m.bindTooltip(esc(s[3]), { permanent: true, direction: "right", className: "star-tip", offset: [4, 0] });
-  }
-
-  // ----- Popups -----
-  function popupHtml(u, layer) {
-    var rows = ["<strong>" + esc(u.name) + "</strong>"];
-    if (u.combined && u.combined !== u.name) rows.push(' <span class="pair-tag">' + esc(u.combined) + "</span>");
-    rows.push("<br>Status: " + esc(u.status) + (u.date ? " &middot; " + esc(u.date) : " &middot; date TBD"));
-    if (u.execution) rows.push("<br>Execution: <b>" + esc(u.execution.fork) + "</b> &rarr; " + esc(u.execution.city));
-    if (u.consensus) rows.push("<br>Consensus: <b>" + esc(u.consensus.fork) + "</b> &rarr; ★ " + esc(u.consensus.star));
-    if (u.execution && u.consensus) {
-      var other = layer === "execution"
-        ? "Paired with star " + esc(u.consensus.star) + " — see Consensus view"
-        : "Paired with city " + esc(u.execution.city.split(",")[0]) + " — see Execution view";
-      rows.push('<br><span style="opacity:.7;font-size:11px;">' + other + "</span>");
-    }
-    return rows.join("");
-  }
-
-  // ===== Dynamic layers (driven by playback / show-all) =====
-  var entries = [];
-  var dyn = [];                 // every dynamic marker/line, for clearing
-  var globeRoute = null, starLink = null;
-  var globeCoords = [], starCoords = [];
-
-  function addUpgrade(i) {
-    var u = entries[i];
-    if (u.execution && u.execution.lat != null && u.execution.lon != null) {
-      var ll = [u.execution.lat, u.execution.lon];
-      var cm = L.circleMarker(ll, { radius: 7, fillColor: statusColor(u.status), color: "#fff", weight: 1.5, fillOpacity: 0.9 })
-        .addTo(globe).bindPopup(popupHtml(u, "execution"));
-      cm.bindTooltip(esc(u.execution.city.split(",")[0]), { permanent: true, direction: "right", className: "label-tip", offset: [6, 0] });
-      dyn.push(cm);
-      globeCoords.push(ll);
-      if (globeRoute) { globeRoute.addLatLng(ll); }
-      else if (globeCoords.length > 1) { globeRoute = L.polyline(globeCoords, { color: COLOR_ROUTE, weight: 1.5, dashArray: "6 4", opacity: 0.6 }).addTo(globe); dyn.push(globeRoute); }
-    }
-    if (u.consensus && u.consensus.ra != null && u.consensus.dec != null) {
-      var pt = sky(u.consensus.ra, u.consensus.dec);
-      var sm = L.circleMarker(pt, { radius: 7, fillColor: COLOR_STAR, color: "#fff7d6", weight: 1.4, fillOpacity: 1 })
-        .addTo(stars).bindPopup(popupHtml(u, "consensus"));
-      sm.bindTooltip(esc(u.consensus.star.split(" ")[0]), { permanent: true, direction: "right", className: "label-tip", offset: [6, 0] });
-      dyn.push(sm);
-      starCoords.push(pt);
-      if (starLink) { starLink.addLatLng(pt); }
-      else if (starCoords.length > 1) { starLink = L.polyline(starCoords, { color: "#9aa6f0", weight: 1.2, dashArray: "3 5", opacity: 0.7 }).addTo(stars); dyn.push(starLink); }
-    }
-  }
-
-  function clearDynamic() {
-    dyn.forEach(function (l) { globe.removeLayer(l); stars.removeLayer(l); });
-    dyn = []; globeRoute = null; starLink = null; globeCoords = []; starCoords = [];
-  }
-
-  function updateCount(shown) {
-    var total = entries.length;
-    var live = entries.filter(function (u) { return u.status === "live"; }).length;
-    document.getElementById("title-count").textContent = (shown < total)
-      ? "— " + shown + " / " + total + " upgrades"
-      : "— " + total + " upgrades (" + live + " live)";
-  }
-
-  function showAll() {
-    clearDynamic();
-    for (var i = 0; i < entries.length; i++) addUpgrade(i);
-    updateCount(entries.length);
-  }
-
-  // ===== Timeline playback (ported from tezosprotocolmap) =====
-  var playBtns = [], playTimer = null, playIndex = 0, isPlaying = false;
-
-  function setPlayIcon() {
-    playBtns.forEach(function (b) {
-      b.textContent = isPlaying ? "⏸" : "▶";
-      b.setAttribute("aria-label", isPlaying ? "Pause timeline" : "Play timeline");
-    });
-  }
-  function stopPlayback() {
-    if (playTimer) { clearTimeout(playTimer); playTimer = null; }
-    isPlaying = false; playIndex = 0; setPlayIcon();
-    setSliderEnabled(true);
-  }
-  function playStep() {
-    if (playIndex >= entries.length) { stopPlayback(); return; }
-    addUpgrade(playIndex);
-    updateCount(playIndex + 1);
-    playIndex++;
-    playTimer = setTimeout(playStep, PLAY_MS);
-  }
-  function togglePlayback() {
-    if (isPlaying) { stopPlayback(); showAll(); return; }
-    clearDynamic(); updateCount(0);
-    isPlaying = true; playIndex = 0; setPlayIcon();
-    setSliderEnabled(false);
-    playStep();
-  }
-
-  function PlaybackControl() {
-    return L.Control.extend({
-      options: { position: "topleft" },
-      onAdd: function () {
-        var c = L.DomUtil.create("div", "playback-control leaflet-bar");
-        var btn = L.DomUtil.create("a", "", c);
-        btn.href = "#"; btn.textContent = "▶";
-        btn.setAttribute("role", "button");
-        btn.setAttribute("aria-label", "Play timeline");
-        L.DomEvent.disableClickPropagation(c);
-        L.DomEvent.on(btn, "click", function (e) { L.DomEvent.preventDefault(e); togglePlayback(); });
-        L.DomEvent.on(btn, "keydown", function (e) {
-          if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { L.DomEvent.preventDefault(e); togglePlayback(); }
-        });
-        playBtns.push(btn);
-        return c;
-      }
-    });
-  }
-
-  // ===== Date slider (one synced control per map) =====
-  var sliderInputs = [], sliderLabels = [];
-
-  function setSliderEnabled(enabled) {
-    sliderInputs.forEach(function (inp) { inp.disabled = !enabled; inp.style.opacity = enabled ? "1" : "0.5"; });
-    if (enabled && sliderInputs.length) {
-      var mx = sliderInputs[0].max;
-      sliderInputs.forEach(function (inp) { inp.value = mx; });
-      updateSliderLabel(Number(mx));
-    }
-  }
-
-  function updateSliderLabel(ts) {
-    if (!sliderInputs.length) return;
-    var mx = Number(sliderInputs[0].max), text;
-    if (ts >= mx) {
-      text = "All upgrades";
-    } else {
-      var d = new Date(ts);
-      text = "Upgrades as of " + d.getUTCFullYear() + "-" +
-        String(d.getUTCMonth() + 1).padStart(2, "0") + "-" + String(d.getUTCDate()).padStart(2, "0");
-    }
-    sliderLabels.forEach(function (l) { l.textContent = text; });
-  }
-
-  function filterByDate(ts) {
-    if (isPlaying) return;
-    var atMax = ts >= Number(sliderInputs[0].max);
-    var sliderDay = utcDayStart(ts);
-    clearDynamic();
-    var shown = 0;
-    for (var i = 0; i < entries.length; i++) {
-      var u = entries[i];
-      if (u.date) {
-        // Compare on the UTC day so an upgrade appears on its activation day.
-        if (utcDayStart(new Date(u.date).getTime()) <= sliderDay) { addUpgrade(i); shown++; }
-      } else if (atMax) {
-        // Undated (upcoming) upgrades show only when the slider is at "all".
-        addUpgrade(i); shown++;
-      }
-    }
-    updateCount(shown);
-    updateSliderLabel(ts);
-  }
-
-  function SliderControl(minTs, maxTs) {
-    return L.Control.extend({
-      options: { position: "bottomleft" },
-      onAdd: function () {
-        var c = L.DomUtil.create("div", "");
-        c.style.cssText = "background:rgba(255,255,255,0.95);padding:9px 12px;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,0.35);min-width:210px;";
-        var lab = L.DomUtil.create("div", "", c);
-        lab.style.cssText = "font-size:12px;margin-bottom:6px;color:#222;font-weight:600;";
-        lab.textContent = "All upgrades";
-        var inp = L.DomUtil.create("input", "", c);
-        inp.type = "range"; inp.min = String(minTs); inp.max = String(maxTs);
-        inp.value = String(maxTs); inp.step = String(DAY_MS);
-        inp.style.cssText = "width:100%;cursor:pointer;";
-        inp.setAttribute("aria-label", "Filter upgrades by activation date");
-        L.DomEvent.disableClickPropagation(c);
-        L.DomEvent.disableScrollPropagation(c);
-        L.DomEvent.on(inp, "input", function () {
-          sliderInputs.forEach(function (o) { if (o !== inp) o.value = inp.value; });
-          filterByDate(Number(inp.value));
-        });
-        sliderInputs.push(inp); sliderLabels.push(lab);
-        return c;
-      }
-    });
-  }
-
-  function addSliders() {
-    var dts = entries.filter(function (u) { return u.date; }).map(function (u) { return new Date(u.date).getTime(); });
-    if (!dts.length) return;
-    var minTs = Math.min.apply(null, dts);
-    var maxTs = Date.now();
-    new (SliderControl(minTs, maxTs))().addTo(globe);
-    new (SliderControl(minTs, maxTs))().addTo(stars);
-  }
-
-  // ===== Legends =====
-  function addLegends() {
-    var gl = L.control({ position: "bottomright" });
-    gl.onAdd = function () {
-      var d = L.DomUtil.create("div", "legend");
-      d.innerHTML = '<strong>Execution layer</strong><br>' +
-        '<i style="background:' + COLOR_LIVE + '"></i> Live<br>' +
-        '<i style="background:' + COLOR_SCHEDULED + '"></i> Scheduled<br>' +
-        '<i style="background:' + COLOR_PLANNED + '"></i> Planned<br>' +
-        '<span class="line"></span> Chronological route';
-      L.DomEvent.disableClickPropagation(d); return d;
-    };
-    gl.addTo(globe);
-
-    var sl = L.control({ position: "bottomright" });
-    sl.onAdd = function () {
-      var d = L.DomUtil.create("div", "legend dark");
-      d.innerHTML = '<strong>Consensus layer</strong><br>' +
-        '★ Named fork-star<br>' +
-        '<span style="opacity:.7">· bright stars &amp; constellations for orientation</span><br>' +
-        '<span class="line" style="border-color:#9aa6f0"></span> Alphabetical order';
-      L.DomEvent.disableClickPropagation(d); return d;
-    };
-    sl.addTo(stars);
-  }
-
-  // ===== Mode switch =====
-  var btnGlobe = document.getElementById("btn-globe");
-  var btnStars = document.getElementById("btn-stars");
-  function setMode(mode) {
-    var showGlobe = mode === "globe";
-    document.getElementById("globe").style.display = showGlobe ? "block" : "none";
-    document.getElementById("stars").style.display = showGlobe ? "none" : "block";
-    btnGlobe.classList.toggle("active", showGlobe);
-    btnStars.classList.toggle("active", !showGlobe);
-    btnGlobe.setAttribute("aria-pressed", String(showGlobe));
-    btnStars.setAttribute("aria-pressed", String(!showGlobe));
-    if (showGlobe) {
-      globe.invalidateSize();
-    } else {
-      stars.invalidateSize();
-      if (!skyFitted) { stars.fitBounds(SKY_BOUNDS); skyFitted = true; }
-    }
-  }
-  btnGlobe.addEventListener("click", function () { setMode("globe"); });
-  btnStars.addEventListener("click", function () { setMode("stars"); });
-
-  drawReferenceSky();
-  addLegends();
-  new (PlaybackControl())().addTo(globe);
-  new (PlaybackControl())().addTo(stars);
-
-  fetch(DATA_URL)
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function (data) {
-      entries = (data && data.upgrades) || [];
-      showAll();
-      addSliders();
-      setMode("globe");
-    })
-    .catch(function (err) { console.error("Failed to load upgrades.json:", err); });
-})();
 </script>
 </body>
 </html>
